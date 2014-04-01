@@ -1,31 +1,34 @@
-function sleep(millis, callback) {
-    setTimeout(function()
-            { callback(); }
-    , millis);
-}
+var baseUrl = 'http://stackoverflow.com';
+var fkey = '1028ef1917213a18d0b242ec6739adab';
 
 function mineMe(rockId) {
   console.log('Mining ' + rockId);
-  $.ajax({type: 'POST', url: 'http://stackoverflow.com/unicoin/mine?rock=' + rockId, data: {'fkey':'1028ef1917213a18d0b242ec6739adab'}, complete: function(data) { console.log('Finished mining with data ' + data.responseText);}})
+  $.ajax({
+    type: 'POST',
+    url: baseUrl + '/unicoin/mine?rock=' + rockId,
+    data: {'fkey': fkey},
+    complete: function(data) {
+      console.log('Finished mining with data ' + data.responseText);
+    }
+  });
 }
 
-function rockMe(timeMult) {
+function rockMe() {
   console.log('Requesting rock...');
-  var rock = 'http://stackoverflow.com/unicoin/rock?_=' + new Date().getTime();
+  var rock = baseUrl + '/unicoin/rock?_=' + new Date().getTime();
   console.log('Url ' + rock);
   $.ajax({url: rock,
     success: function(data) {
       var daRock = data.rock;
       console.log('Got rock ' + daRock);
-      var mineMeLater = function() { mineMe(daRock) };
-      var id = setTimeout(mineMeLater, timeMult * 11000);  // it says 10secs but not quite enough
-      console.log('Scheduled mining as ' + id);
+      mineMe(daRock);
     }
   });
 }
 
 function rockMeTimes(times) {
   for (var i = 0; i < times; i++) {
-    rockMe(i);
+    var id = setTimeout(rockMe, i * 11000);  // it says 10secs but not quite enough
+    console.log('Scheduled mining ' + i + ' as ' + id);
   }
 }
